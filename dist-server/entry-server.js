@@ -1,6 +1,6 @@
 import { jsx } from "react/jsx-runtime";
 function App() {
-  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("h1", { children: "Hello111 react from EM room!" }) });
+  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("h1", { children: "Hello225 react from EM room!" }) });
 }
 const app = /* @__PURE__ */ jsx(App, {});
 export {
