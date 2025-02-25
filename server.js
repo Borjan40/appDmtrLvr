@@ -6,6 +6,8 @@ import {readFileSync} from 'fs'
 const server = express();
 const template = readFileSync('./dist/index.html').toString('utf-8');
 
+server.use(express.static('dist'))
+
 server.get('*', function(_req, resp){
     const html = renderToString(app);
     const page = template.replace('<!--ssr-->',html)
