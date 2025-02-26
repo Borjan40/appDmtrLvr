@@ -1,7 +1,15 @@
-import app from './app.jsx'
+// import app from './app.jsx'
+import createApp from "./app";
 
-// choose activeRoute by url
-// some async oper to get data
-// e t.c.
+function createServerApp(){
+    console.log('here');
+    const app = createApp();
 
-export default app;
+        // choose activeRoute by url
+        // some async oper to get data
+        // e t.c.
+
+    return app;
+}
+
+export default createServerApp;

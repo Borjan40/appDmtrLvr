@@ -1,13 +1,10 @@
 import App from './components/App.jsx';
-const app = <App />;
-export default app;
+// const app = <App />;
+// export default app;
 
-// import React from 'react'
-// import ReactDOM from 'react-dom/client' 
-// import App from './components/App.jsx'
+function createApp(){
+    const app = <App/>;
+    return app;
+}
 
-// ReactDOM.createRoot(document.getElementById('root')).render(
-//   <React.StrictMode>
-//    <App/>
-//   </React.StrictMode>,
-// )
+export default createApp;
