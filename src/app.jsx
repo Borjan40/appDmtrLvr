@@ -1,9 +1,19 @@
+import { Provider } from 'mobx-react';
 import App from './components/App.jsx';
+import createRootStore from './store/index.js';
+import storeContext from './contexts/store.js';
+
 // const app = <App />;
 // export default app;
 
 function createApp(){
-    const app = <App/>;
+const rootStore = createRootStore();
+
+
+    const app = 
+    <storeContext.Provider>
+        <App/>;
+    </storeContext.Provider>
     return app;
 }
 
