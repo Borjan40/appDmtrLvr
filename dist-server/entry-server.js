@@ -38,19 +38,36 @@ function createRootStore() {
   };
   return rootStore;
 }
-const http = axios.create({
-  baseURL: "https://faceprog.ru/reactcourseapi/",
-  timeout: 1e4
-});
-const products = {
-  async all() {
-    return (await http.get("products/all.php")).data;
-  }
-};
-const api = {
-  products
-};
+function createHttpPlugin(baseURL) {
+  const http = axios.create({
+    baseURL,
+    timeout: 1e4
+  });
+  return http;
+}
+function createProductsApi(http) {
+  return {
+    async all() {
+      return (await http.get("products/all.php")).data;
+    }
+  };
+}
+function createCartApi(http) {
+  return {
+    async add(id) {
+      return (await http.get("products/cart.php")).data;
+    }
+  };
+}
+function createApi(http) {
+  return {
+    products: createProductsApi(http),
+    card: createCartApi(http)
+  };
+}
 function createApp() {
+  const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
+  const api = createApi(http);
   const rootStore = createRootStore();
   http.interceptors.request.use((config) => {
     console.log(1);

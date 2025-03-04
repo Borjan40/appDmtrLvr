@@ -1,8 +1,11 @@
 import axios from 'axios'
 
-const http = axios.create({
-    baseURL: 'https://faceprog.ru/reactcourseapi/',
-    timeout: 10000
-})
+function createHttpPlugin(baseURL){
+    const http = axios.create({
+        baseURL,
+        timeout: 10000
+    })
+return http;
+}
 
-export default http;
+export default createHttpPlugin;
