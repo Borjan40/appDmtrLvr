@@ -8,6 +8,7 @@ import { jsxs, jsx } from "react/jsx-runtime";
 import { observer } from "mobx-react";
 import { createContext, useState, useContext } from "react";
 import { makeAutoObservable } from "mobx";
+import axios from "axios";
 const storeContext = createContext(null);
 function App() {
   const [cnt, setCnt] = useState(0);
@@ -37,8 +38,25 @@ function createRootStore() {
   };
   return rootStore;
 }
+const http = axios.create({
+  baseURL: "https://faceprog.ru/reactcourseapi/",
+  timeout: 1e4
+});
+const products = {
+  async all() {
+    return (await http.get("products/all.php")).data;
+  }
+};
+const api = {
+  products
+};
 function createApp() {
   const rootStore = createRootStore();
+  http.interceptors.request.use((config) => {
+    console.log(1);
+    return config;
+  });
+  api.products.all();
   const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: rootStore, children: /* @__PURE__ */ jsx(observedApp, {}) });
   return app;
 }

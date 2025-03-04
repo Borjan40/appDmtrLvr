@@ -1,15 +1,37 @@
 # React + Vite
 
-- отключили раздачу статики в файле server.js ---> //server.use(express.static('dist')) HTML ответ приходит и в нем сгенерированный бандл JS из dist/assets/index-dac0ddbf.js не загружается;
+Перехватчики в axios добавляются с помощью методов interceptors.request.use для запросов и interceptors.response.use для ответов. Каждый раз, когда вы вызываете эти методы, добавляется новый перехватчик.
 
-- сделали стор с помощью mobx;
-- в компоненте APP делаем прямой импорт  rootStore из ...store (при условии, что App по сути модуль синглтон);
+В вашем случае, в функции createApp вы добавляете перехватчик запроса с помощью http.interceptors.request.use. Если эта функция будет вызываться несколько раз, перехватчик будет добавляться заново без очистки предыдущих, что приведёт к их накоплению.
 
-В результате вышеописанного при запуске серверной сборки с SSR у разных юзеров при выводе на экран {rootStore.user.id} генерируется одинаковый(а он генериться с пом. Math.random, и на dev сборке id при каждом запуске страницы меняется)
+Чтобы избежать этого, можно использовать метод eject для удаления перехватчика перед добавлением нового. Этот метод принимает идентификатор перехватчика, который возвращается при его добавлении.
 
-Проблема заключается в том, что в файл server.js один раз берет собранный бандл 
---> import app from './dist-server/entry-server.js';
-При этом rootStore в файле src/store/index.js общий, и сделан как синглтон.
+**Вот пример того, как это можно сделать:**
+```
+function createApp() {
+  const rootStore = createRootStore();
+
+  // Получаем идентификатор текущего перехватчика
+  const interceptorId = http.interceptors.request.use(config => {
+    console.log(1);
+    return config;
+  });
+
+  api.products.all();
+  const app = (
+    <storeContext.Provider value={rootStore}>
+      <App />
+    </storeContext.Provider>
+  );
+
+  // Удаляем перехватчик перед возвратом приложения
+  http.interceptors.request.eject(interceptorId);
+  return app;
+}
+```
+В этом примере мы сначала добавляем перехватчик и сохраняем его идентификатор в переменную interceptorId. Затем мы удаляем перехватчик с помощью метода eject перед возвратом приложения. Это гарантирует, что каждый раз при создании приложения будет использоваться только один перехватчик.
+
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
