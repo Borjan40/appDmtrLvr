@@ -7,7 +7,7 @@ var __publicField = (obj, key, value) => {
 import { jsxs, jsx } from "react/jsx-runtime";
 import { observer } from "mobx-react";
 import { createContext, useState, useContext } from "react";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
 const storeContext = createContext(null);
 function App() {
@@ -21,7 +21,9 @@ function App() {
     ] }),
     /* @__PURE__ */ jsx("button", { type: "button", onClick: () => setCnt(cnt + 1), children: "+1" }),
     /* @__PURE__ */ jsx("hr", {}),
-    store.user.id
+    store.user.id,
+    /* @__PURE__ */ jsx("hr", {}),
+    store.catalog.products.length
   ] });
 }
 const observedApp = observer(App);
@@ -32,9 +34,21 @@ class User {
     this.id = Math.random();
   }
 }
-function createRootStore() {
+class Catalog {
+  constructor(api) {
+    __publicField(this, "products", []);
+    makeAutoObservable(this);
+    this.api = api;
+  }
+  async load() {
+    const data = await this.api.all();
+    runInAction(() => this.products = data);
+  }
+}
+function createRootStore(api) {
   const rootStore = {
-    user: new User()
+    user: new User(api),
+    catalog: new Catalog(api.products)
   };
   return rootStore;
 }
@@ -65,21 +79,17 @@ function createApi(http) {
     card: createCartApi(http)
   };
 }
-function createApp() {
+async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
   const api = createApi(http);
-  const rootStore = createRootStore();
-  http.interceptors.request.use((config) => {
-    console.log(1);
-    return config;
-  });
-  api.products.all();
+  const rootStore = createRootStore(api);
+  await rootStore.catalog.load();
   const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: rootStore, children: /* @__PURE__ */ jsx(observedApp, {}) });
   return app;
 }
-function createServerApp() {
+async function createServerApp() {
   console.log("here");
-  const app = createApp();
+  const app = await createApp();
   return app;
 }
 export {
