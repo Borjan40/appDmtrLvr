@@ -7,7 +7,7 @@ var __publicField = (obj, key, value) => {
 import { jsx, jsxs } from "react/jsx-runtime";
 import { observer } from "mobx-react";
 import { createContext, useState, useContext } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { useRoutes, Link } from "react-router-dom";
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
 import { StaticRouter } from "react-router-dom/server.mjs";
@@ -18,9 +18,24 @@ function PageA() {
 function PageB() {
   return /* @__PURE__ */ jsx("div", { children: "Page B" });
 }
+const routes = [
+  {
+    path: "/",
+    Component: PageA
+  },
+  {
+    path: "/b",
+    Component: PageB
+  },
+  {
+    path: "*",
+    element: /* @__PURE__ */ jsx("div", { children: "404" })
+  }
+];
 function App() {
   const [cnt, setCnt] = useState(0);
   const store = useContext(storeContext);
+  const view = useRoutes(routes);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsxs("h1", { children: [
       "Hello ",
@@ -36,11 +51,7 @@ function App() {
     /* @__PURE__ */ jsx("hr", {}),
     store.catalog.products.length,
     /* @__PURE__ */ jsx("hr", {}),
-    /* @__PURE__ */ jsxs(Routes, { children: [
-      /* @__PURE__ */ jsx(Route, { path: "/", Component: PageA }),
-      /* @__PURE__ */ jsx(Route, { path: "/b", Component: PageB }),
-      /* @__PURE__ */ jsx(Route, { path: "*", element: /* @__PURE__ */ jsx("div", { children: "404" }) })
-    ] })
+    view
   ] });
 }
 const observedApp = observer(App);
