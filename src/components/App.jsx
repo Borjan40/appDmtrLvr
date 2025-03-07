@@ -26,6 +26,7 @@ function App() {
       <Routes>
         <Route path="/" Component={PageA}></Route>
         <Route path="/b" Component={PageB}></Route>
+        <Route path="*" element={<div>404</div>}></Route>
       </Routes>
     </div>
   );
