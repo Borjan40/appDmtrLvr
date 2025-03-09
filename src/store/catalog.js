@@ -1,17 +1,14 @@
 import { makeAutoObservable, runInAction } from "mobx";
 
-
 class Catalog {
-  products = [];
-
-  constructor(api) {
-    makeAutoObservable(this);
-    this.api = api;
+  constructor(rootStore) {
+    makeAutoObservable(this, { rootStore: false });
+    this.rootStore = rootStore;
   }
 
   async load() {
-    const data = await this.api.all();
-    runInAction(() => this.products = data)
+    const data = await this.rootStore.api.products.all();
+    runInAction(() => (this.products = data));
   }
 }
 

@@ -1,7 +1,7 @@
 import { makeAutoObservable } from "mobx";
 
-class User {
-  id = null;
+class Cart {
+  items = [];
 
   constructor(rootStore) {
     makeAutoObservable(this, { rootStore: false });
@@ -9,4 +9,4 @@ class User {
   }
 }
 
-export default User;
+export default Cart;

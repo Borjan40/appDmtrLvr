@@ -1,6 +1,6 @@
 // import { Provider } from 'mobx-react';
 import App from "./components/App.jsx";
-import createRootStore from "./store/index.js";
+import RootStore from "./store/index.js";
 import storeContext from "./contexts/store.js";
 import createHttpPlugin from "./plugins/http.js";
 import createApi from "./api/index.js";
@@ -8,7 +8,7 @@ import createApi from "./api/index.js";
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
   const api = createApi(http);
-  const rootStore = createRootStore(api);
+  const rootStore = new RootStore(api);
 
   /*       http.interceptors.request.use(config => {
         console.log(1);

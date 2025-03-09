@@ -1,17 +1,15 @@
+import Cart from "./cart";
 import User from "./user";
 import Catalog from "./catalog";
-/* const rootStore = {
-    user: new User
-}
-export default rootStore; */
 
+class RootStore {
+  constructor(api) {
+    this.api = api;
 
-function createRootStore(api){
-    const rootStore = {
-        user: new User(api),
-        catalog: new Catalog(api.products)
-    }
-    return rootStore;
+    this.catalog = new Catalog(this);
+    this.user = new User(this);
+    this.cart = new Cart(this);
+  }
 }
 
-export default createRootStore
+export default RootStore;
