@@ -4,28 +4,41 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { jsx, jsxs } from "react/jsx-runtime";
-import { observer } from "mobx-react";
-import { createContext, useState, useContext } from "react";
-import { useRoutes, Link } from "react-router-dom";
+import { jsxs, jsx } from "react/jsx-runtime";
+import { Link, useRoutes } from "react-router-dom";
+import { createContext, useContext } from "react";
+import { observer } from "mobx-react-lite";
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
 import { StaticRouter } from "react-router-dom/server.mjs";
+import "http";
 const storeContext = createContext(null);
-function PageA() {
-  return /* @__PURE__ */ jsx("div", { children: "Page A" });
+function useStore(...names) {
+  const store = useContext(storeContext);
+  return store;
 }
-function PageB() {
-  return /* @__PURE__ */ jsx("div", { children: "Page B" });
+function Products() {
+  const { catalog } = useStore();
+  return /* @__PURE__ */ jsxs("div", { children: [
+    /* @__PURE__ */ jsx("h1", { children: "Catalog" }),
+    /* @__PURE__ */ jsx("div", { className: "row", children: catalog.products.map((pr) => /* @__PURE__ */ jsxs("div", { className: "col col-4 mt-3", children: [
+      /* @__PURE__ */ jsx("h3", { children: pr.title }),
+      /* @__PURE__ */ jsx(Link, { to: `/catalog/${pr.id}`, children: "Read more" })
+    ] }, pr.id)) })
+  ] });
+}
+const observerProducts = observer(Products);
+function ProductItem() {
+  return /* @__PURE__ */ jsx("div", { children: "ProductItem" });
 }
 const routes = [
   {
     path: "/",
-    Component: PageA
+    Component: observerProducts
   },
   {
-    path: "/b",
-    Component: PageB
+    path: "/catalog/:id",
+    Component: ProductItem
   },
   {
     path: "*",
@@ -33,52 +46,47 @@ const routes = [
   }
 ];
 function App() {
-  const [cnt, setCnt] = useState(0);
-  const store = useContext(storeContext);
   const view = useRoutes(routes);
-  return /* @__PURE__ */ jsxs("div", { children: [
-    /* @__PURE__ */ jsxs("h1", { children: [
-      "Hello ",
-      cnt,
-      " react from EM room!"
-    ] }),
-    /* @__PURE__ */ jsx(Link, { to: "/", children: "Page A" }),
-    /* @__PURE__ */ jsx(Link, { to: "/b", children: "Page B" }),
-    /* @__PURE__ */ jsx("hr", {}),
-    /* @__PURE__ */ jsx("button", { type: "button", onClick: () => setCnt(cnt + 1), children: "+1" }),
-    /* @__PURE__ */ jsx("hr", {}),
-    store.user.id,
-    /* @__PURE__ */ jsx("hr", {}),
-    store.catalog.products.length,
+  return /* @__PURE__ */ jsxs("div", { className: "container mt-2", children: [
+    /* @__PURE__ */ jsx("h1", { children: "Hello react from EM room!" }),
     /* @__PURE__ */ jsx("hr", {}),
     view
   ] });
 }
-const observedApp = observer(App);
+class Cart {
+  constructor(rootStore) {
+    __publicField(this, "items", []);
+    makeAutoObservable(this, { rootStore: false });
+    this.rootStore = rootStore;
+  }
+}
 class User {
-  constructor() {
+  constructor(rootStore) {
     __publicField(this, "id", null);
-    makeAutoObservable(this);
-    this.id = Math.random();
+    makeAutoObservable(this, { rootStore: false });
+    this.rootStore = rootStore;
+  }
+  some() {
+    this.rootStore.users.products;
   }
 }
 class Catalog {
-  constructor(api) {
-    __publicField(this, "products", []);
-    makeAutoObservable(this);
-    this.api = api;
+  constructor(rootStore) {
+    makeAutoObservable(this, { rootStore: false });
+    this.rootStore = rootStore;
   }
   async load() {
-    const data = await this.api.all();
+    const data = await this.rootStore.api.products.all();
     runInAction(() => this.products = data);
   }
 }
-function createRootStore(api) {
-  const rootStore = {
-    user: new User(api),
-    catalog: new Catalog(api.products)
-  };
-  return rootStore;
+class RootStore {
+  constructor(api) {
+    this.api = api;
+    this.catalog = new Catalog(this);
+    this.user = new User(this);
+    this.cart = new Cart(this);
+  }
 }
 function createHttpPlugin(baseURL) {
   const http = axios.create({
@@ -110,9 +118,9 @@ function createApi(http) {
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
   const api = createApi(http);
-  const rootStore = createRootStore(api);
+  const rootStore = new RootStore(api);
   await rootStore.catalog.load();
-  const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: rootStore, children: /* @__PURE__ */ jsx(observedApp, {}) });
+  const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: rootStore, children: /* @__PURE__ */ jsx(App, {}) });
   return app;
 }
 async function createServerApp(context) {

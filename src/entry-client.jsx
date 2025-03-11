@@ -12,3 +12,5 @@ import { BrowserRouter } from "react-router-dom";
     </React.StrictMode>
   );
 })();
+
+import "bootstrap/dist/css/bootstrap.min.css";

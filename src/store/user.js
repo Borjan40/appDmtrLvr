@@ -7,6 +7,10 @@ class User {
     makeAutoObservable(this, { rootStore: false });
     this.rootStore = rootStore;
   }
+
+  some() {
+    this.rootStore.users.products;
+  }
 }
 
 export default User;

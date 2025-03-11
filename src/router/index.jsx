@@ -1,15 +1,15 @@
 import { Component } from "react";
-import PageA from "../pages/A";
-import PageB from "../pages/B";
+import observerProducts from "../pages/Products";
+import ProductItem from "../pages/ProductItem";
 
 const routes = [
   {
     path: "/",
-    Component: PageA,
+    Component: observerProducts,
   },
   {
-    path: "/b",
-    Component: PageB,
+    path: "/catalog/:id",
+    Component: ProductItem,
   },
   {
     path: "*",
