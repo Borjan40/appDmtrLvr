@@ -6,6 +6,10 @@ class Catalog {
     this.rootStore = rootStore;
   }
 
+  get one() {
+    return (id) => this.products.find((pr) => pr.id === id);
+  }
+
   async load() {
     const data = await this.rootStore.api.products.all();
     runInAction(() => (this.products = data));

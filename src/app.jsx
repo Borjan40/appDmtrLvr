@@ -7,6 +7,9 @@ import createApi from "./api/index.js";
 
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
+  {
+    // console.log(http());
+  }
   const api = createApi(http);
   const rootStore = new RootStore(api);
 

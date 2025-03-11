@@ -4,6 +4,9 @@ import { observer } from "mobx-react-lite";
 
 function Products() {
   const { catalog } = useStore();
+  
+    console.log(catalog);
+  
   return (
     <div>
       <h1>Catalog</h1>

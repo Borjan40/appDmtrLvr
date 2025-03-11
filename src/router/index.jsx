@@ -1,11 +1,11 @@
 import { Component } from "react";
-import observerProducts from "../pages/Products";
+import Products from "../pages/Products";
 import ProductItem from "../pages/ProductItem";
 
 const routes = [
   {
     path: "/",
-    Component: observerProducts,
+    Component: Products,
   },
   {
     path: "/catalog/:id",
