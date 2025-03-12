@@ -7,25 +7,18 @@ import createApi from "./api/index.js";
 
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
-  {
-    // console.log(http());
-  }
+
   const api = createApi(http);
-  const rootStore = new RootStore(api);
-
-  /*       http.interceptors.request.use(config => {
-        console.log(1);
-        return config;
-    })
-    api.products.all(); */
-
-  await rootStore.catalog.load();
+  const store = new RootStore(api);
+  console.log(store);
+  await store.catalog.load();
   const app = (
-    <storeContext.Provider value={rootStore}>
+    <storeContext.Provider value={store}>
       <App />
     </storeContext.Provider>
   );
-  return app;
+
+  return { app, store };
 }
 
 export default createApp;

@@ -5,13 +5,13 @@ import http from "http";
 
 async function createServerApp(context) {
   console.log("here");
-  const app = await createApp();
+  const { app, store } = await createApp();
 
   // choose activeRoute by url
   // some async oper to get data
   // e t.c.
-
-  return <StaticRouter location={context.url}>{app}</StaticRouter>;
+  const serverApp = <StaticRouter location={context.url}>{app}</StaticRouter>;
+  return { app: serverApp, store };
 }
 
 export default createServerApp;

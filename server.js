@@ -12,9 +12,12 @@ server.use("/favicon.ico", express.static("dist/favicon.ico"));
 
 server.get("*", async function (req, resp) {
   const context = { url: req.url };
-  const app = await createApp(context);
+  const { app, store } = await createApp(context);
+  // console.log(store);
   const html = renderToString(app);
-  const page = template.replace("<!--ssr-->", html);
+  const page = template
+    .replace("<!--ssr-->", html)
+    .replace("<!--ssr-title-->", store.page.title);
   resp.end(page);
 });
 

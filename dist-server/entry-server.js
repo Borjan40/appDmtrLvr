@@ -5,7 +5,7 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 import { jsxs, jsx } from "react/jsx-runtime";
-import { Link, useRoutes } from "react-router-dom";
+import { Link, useParams, useRoutes } from "react-router-dom";
 import { createContext, useContext } from "react";
 import { observer } from "mobx-react-lite";
 import { makeAutoObservable, runInAction } from "mobx";
@@ -19,6 +19,7 @@ function useStore(...names) {
 }
 function Products() {
   const { catalog } = useStore();
+  console.log(catalog);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsx("h1", { children: "Catalog" }),
     /* @__PURE__ */ jsx("div", { className: "row", children: catalog.products.map((pr) => /* @__PURE__ */ jsxs("div", { className: "col col-4 mt-3", children: [
@@ -29,8 +30,20 @@ function Products() {
 }
 const observerProducts = observer(Products);
 function ProductItem() {
-  return /* @__PURE__ */ jsx("div", { children: "ProductItem" });
+  const { catalog, page } = useStore();
+  const { id } = useParams();
+  const validId = /^[1-9]+\d*$/.test(id);
+  const product = catalog.one(+id);
+  if (!validId || !product) {
+    return /* @__PURE__ */ jsx("div", { children: "404" });
+  }
+  page.update(`${product.title} - very good price, buy now!`);
+  return /* @__PURE__ */ jsxs("h1", { children: [
+    "ProductItem:",
+    product.title
+  ] });
 }
+const observerProductsItem = observer(ProductItem);
 const routes = [
   {
     path: "/",
@@ -38,7 +51,7 @@ const routes = [
   },
   {
     path: "/catalog/:id",
-    Component: ProductItem
+    Component: observerProductsItem
   },
   {
     path: "*",
@@ -75,9 +88,24 @@ class Catalog {
     makeAutoObservable(this, { rootStore: false });
     this.rootStore = rootStore;
   }
+  get one() {
+    return (id) => this.products.find((pr) => pr.id === id);
+  }
   async load() {
     const data = await this.rootStore.api.products.all();
     runInAction(() => this.products = data);
+  }
+}
+class Page {
+  constructor(rootStore) {
+    __publicField(this, "status", 200);
+    __publicField(this, "title", []);
+    makeAutoObservable(this, { rootStore: false });
+    this.rootStore = rootStore;
+  }
+  update(title, status = 200) {
+    this.title = title;
+    this.status = status;
   }
 }
 class RootStore {
@@ -86,6 +114,7 @@ class RootStore {
     this.catalog = new Catalog(this);
     this.user = new User(this);
     this.cart = new Cart(this);
+    this.page = new Page(this);
   }
 }
 function createHttpPlugin(baseURL) {
@@ -118,15 +147,16 @@ function createApi(http) {
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
   const api = createApi(http);
-  const rootStore = new RootStore(api);
-  await rootStore.catalog.load();
-  const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: rootStore, children: /* @__PURE__ */ jsx(App, {}) });
-  return app;
+  const store = new RootStore(api);
+  await store.catalog.load();
+  const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) });
+  return { app, store };
 }
 async function createServerApp(context) {
   console.log("here");
-  const app = await createApp();
-  return /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: app });
+  const { app, store } = await createApp();
+  const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: app });
+  return { app: serverApp, store };
 }
 export {
   createServerApp as default

@@ -1,14 +1,22 @@
 import useStore from "../hooks/useStore";
 import { observer } from "mobx-react-lite";
+import { useParams } from "react-router-dom";
 
 function ProductItem() {
-  const { catalog } = useStore();
+  const { catalog, page } = useStore();
+  console.log()
+  const { id } = useParams();
+  const validId = /^[1-9]+\d*$/.test(id);
+  const product = catalog.one(+id);
 
-  console.log(catalog.one(100));
+  if (!validId || !product) {
+    return <div>404</div>;
+  }
 
-  return <h1>ProductItem</h1>;
+  page.update(`${product.title} - very good price, buy now!`);
+
+  return <h1>ProductItem:{product.title}</h1>;
 }
 
 const observerProductsItem = observer(ProductItem);
-
 export default observerProductsItem;
