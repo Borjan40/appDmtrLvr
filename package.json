@@ -1,21 +1,17 @@
 {
-  "name": "react-level2-11",
+  "name": "react-ts-addon",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:client": "vite build",
-    "build:server": "vite build --outDir dist-server --ssr src/entry-server.jsx",
-    "build": "npm run build:client && npm run build:server",
-    "prod": "nodemon server.js --watch dist-server/entry-server.js",
-    "lint": "eslint. --ext js, jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "start": "node server.js"
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "bootstrap": "^5.3.1",
-    "express": "4.18.2",
+    "axios": "1.5.0",
+    "bootstrap": "5.3.1",
     "mobx": "6.10.2",
     "mobx-react": "9.0.1",
     "react": "18.2.0",
@@ -25,17 +21,13 @@
   "devDependencies": {
     "@types/react": "18.2.15",
     "@types/react-dom": "18.2.7",
+    "@typescript-eslint/eslint-plugin": "6.0.0",
+    "@typescript-eslint/parser": "6.0.0",
     "@vitejs/plugin-react": "4.0.3",
-    "axios": "1.5.0",
     "eslint": "8.45.0",
-    "eslint-plugin-react": "7.32.2",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.3",
-    "nodemon": "3.0.1",
-    "vite": "4.4.9"
-  },
-  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "main": "eslint.config.js",
-  "author": "",
-  "license": "ISC"
+    "typescript": "5.0.2",
+    "vite": "4.4.5"
+  }
 }
