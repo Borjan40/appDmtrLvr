@@ -28,7 +28,9 @@ function ProductItem() {
           { text: "XL", value: "2" },
         ]}
         value={prodVar}
-      ></Buttons>
+        title={"Set Size"}
+        onChange={setProdVar}
+      />
     </div>
   );
 }
