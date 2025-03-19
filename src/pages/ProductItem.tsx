@@ -29,7 +29,9 @@ function ProductItem() {
         ]}
         value={prodVar}
         title={"Set Size"}
-        onChange={setProdVar}
+        changed={setProdVar}
+        className="my-3 alert alert-success"
+        tabIndex={1}
       />
     </div>
   );
