@@ -29,9 +29,10 @@ function ProductItem() {
         ]}
         value={prodVar}
         title={"Set Size"}
-        changed={setProdVar}
-        className="my-3 alert alert-success"
-        tabIndex={1}
+        onChange={setProdVar}
+        rootAttrs={{ className: "my-3 alert alert-success", tabIndex: 1 }}
+        // className="my-3 alert alert-success"
+        // tabIndex={1}
       />
     </div>
   );

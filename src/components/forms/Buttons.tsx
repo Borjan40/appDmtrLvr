@@ -1,11 +1,19 @@
 import { HTMLAttributes } from "react";
 
-interface ButtonsProps extends HTMLAttributes<HTMLDivElement> {
+// interface ButtonsProps extends HTMLAttributes<HTMLDivElement> {
+//   title?: string;
+//   variants: ButtonVariant[];
+//   value: string;
+//   changed: (value: string) => void;
+// //   className?: string;
+// }
+
+interface ButtonsProps {
   title?: string;
   variants: ButtonVariant[];
   value: string;
-  changed: (value: string) => void;
-  className?: string;
+  onChange: (value: string) => void;
+  rootAttrs: HTMLAttributes<HTMLDivElement>;
 }
 
 interface ButtonVariant {
@@ -17,11 +25,11 @@ function Buttons({
   title,
   variants,
   value,
-  changed,
-  ...otherProps
+  onChange,
+  ...rootAttrs
 }: ButtonsProps) {
   return (
-    <div {...otherProps}>
+    <div {...rootAttrs}>
       {title && <h3>{title}</h3>}
       {variants.map((variant) => {
         const btnStateCl =
@@ -31,12 +39,12 @@ function Buttons({
             type="button"
             className={`btn me-3 ${btnStateCl}`}
             key={variant.value}
-            onClick={() => changed(variant.value)}
+            onClick={() => onChange(variant.value)}
           >
             {variant.text}
           </button>
         );
-      })} 
+      })}
     </div>
   );
 }
