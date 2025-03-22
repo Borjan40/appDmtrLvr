@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import createApp from "./app";
+import createApp from "./App";
 import { BrowserRouter } from "react-router-dom";
 
 (async function () {

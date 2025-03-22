@@ -13,7 +13,7 @@ function ProductItem() {
   const [prodVar, setProdVar] = useState("0");
 
   if (!validId || !product) {
-    return <div>404</div>;
+    return <div>404 prod</div>;
   }
 
   page.update(`${product.title} - very good price, buy now!`);

@@ -14,7 +14,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <div>404</div>,
+    element: <div>404 router</div>,
   },
 ];
 
