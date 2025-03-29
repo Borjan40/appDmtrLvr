@@ -25,7 +25,7 @@ server.get("*", async function (req, resp) {
     .replace("<!--ssr-title-->", store.page.title); // Вставка заголовка страницы
 
   // Отправка готовой страницы клиенту
-  resp.end(page);
+  resp.status(store.page.status).end(page);
 });
 
 server.listen(8000);

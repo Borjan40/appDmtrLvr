@@ -2,6 +2,7 @@ import { jsxs, jsx } from "react/jsx-runtime";
 import { Link, useParams, useRoutes } from "react-router-dom";
 import { createContext, useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
+import { observer as observer$1 } from "mobx-react";
 import { makeAutoObservable, runInAction } from "mobx";
 import axios from "axios";
 import { StaticRouter } from "react-router-dom/server.mjs";
@@ -15,7 +16,6 @@ function useStore() {
 }
 function Products() {
   const { catalog } = useStore();
-  console.log("Products.jsx catalog", catalog);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsx("h1", { children: "Catalog" }),
     /* @__PURE__ */ jsx("div", { className: "row", children: catalog.products.map((pr) => /* @__PURE__ */ jsxs("div", { className: "col col-4 mt-3", children: [
@@ -49,6 +49,13 @@ function Buttons({
     })
   ] });
 }
+const Error404 = observer$1(function({
+  title = "Page not found"
+}) {
+  const { page } = useStore();
+  page.update(title, 404);
+  return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("h1", { children: title }) });
+});
 function ProductItem() {
   const { catalog, page } = useStore();
   const params = useParams();
@@ -57,7 +64,7 @@ function ProductItem() {
   const product = catalog.one(+id);
   const [prodVar, setProdVar] = useState("0");
   if (!validId || !product) {
-    return /* @__PURE__ */ jsx("div", { children: "404 prod" });
+    return /* @__PURE__ */ jsx(Error404, { title: "Product not found" });
   }
   page.update(`${product.title} - very good price, buy now!`);
   return /* @__PURE__ */ jsxs("div", { children: [
@@ -93,7 +100,7 @@ const routes = [
   },
   {
     path: "*",
-    element: /* @__PURE__ */ jsx("div", { children: "404 router" })
+    element: /* @__PURE__ */ jsx(Error404, {})
   }
 ];
 function App() {

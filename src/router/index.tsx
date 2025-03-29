@@ -2,6 +2,7 @@ import { Component } from "react";
 import Products from "../pages/Products";
 import ProductItem from "../pages/ProductItem";
 import { RouteObject } from "react-router-dom";
+import Error404 from "../components/errors/Error404";
 
 const routes: RouteObject[] = [
   {
@@ -14,7 +15,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "*",
-    element: <div>404 router</div>,
+    element: <Error404 />,
   },
 ];
 

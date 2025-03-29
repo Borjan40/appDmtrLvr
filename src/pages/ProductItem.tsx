@@ -3,6 +3,7 @@ import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import Buttons from "../components/forms/Buttons";
 import { useState } from "react";
+import Error404 from "../components/errors/Error404";
 
 function ProductItem() {
   const { catalog, page } = useStore();
@@ -13,7 +14,7 @@ function ProductItem() {
   const [prodVar, setProdVar] = useState("0");
 
   if (!validId || !product) {
-    return <div>404 prod</div>;
+    return <Error404 title="Product not found" />;
   }
 
   page.update(`${product.title} - very good price, buy now!`);
