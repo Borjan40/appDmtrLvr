@@ -188,7 +188,7 @@ function createHttpPlugin(baseURL) {
 function createProductsApi(http) {
   return {
     async all() {
-      return (await http.get("products/index.php")).data;
+      return (await http.get("products/indeex.php")).data;
     },
     async one(id) {
       return (await http.get(`products/index.php?id=${id}`)).data;

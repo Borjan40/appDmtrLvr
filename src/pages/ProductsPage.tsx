@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import useStore from "../hooks/useStore";
 import { observer } from "mobx-react-lite";
 
-function Products() {
+const ProductsPage = observer(() => {
   const { catalog } = useStore();
 
   // console.log("Products.tsx catalog", catalog);
@@ -20,8 +20,6 @@ function Products() {
       </div>
     </div>
   );
-}
+});
 
-const observerProducts = observer(Products);
-
-export default observerProducts;
+export default ProductsPage;

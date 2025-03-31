@@ -7,7 +7,7 @@ function createProductsApi(http: AxiosInstance) {
       return (await http.get<TProduct[]>("products/index.php")).data;
     },
     async one(id: number) {
-      return (await http.get<TProductItem>(`products/index.php?id=${id}`)).data;
+      return (await http.get<TProductItem>(`products/index.php?id=${id}&delay`)).data;
     },
   };
 }

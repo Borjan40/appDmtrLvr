@@ -1,6 +1,5 @@
-import { Component } from "react";
-import Products from "../pages/Products";
-import ProductItem from "../pages/ProductItem";
+import ProductsPage from "../pages/ProductsPage";
+import ProductItemPage from "../pages/ProductItemPage";
 import Navigate from "../components/system/Navigate";
 import { RouteObject } from "react-router-dom";
 import Error404 from "../components/errors/Error404";
@@ -8,11 +7,11 @@ import Error404 from "../components/errors/Error404";
 const routes: RouteObject[] = [
   {
     path: "/",
-    Component: Products,
+    Component: ProductsPage,
   },
   {
     path: "/catalog/:id",
-    Component: ProductItem,
+    Component: ProductItemPage,
   },
   { path: "/oldd", element: <Navigate to="/" /> },
   {
