@@ -4,6 +4,7 @@ import RootStore from ".";
 class Page {
   status = 200;
   title = "";
+  redirectTo: string | null = null;
   rootStore: RootStore;
 
   constructor(rootStore: RootStore) {
@@ -19,6 +20,11 @@ class Page {
       document.title = title;
     }
   }
+
+  redirect(url: string, status: number = 301) {
+    this.redirectTo = url;
+    this.status = status;
+}
 }
 
 export default Page;

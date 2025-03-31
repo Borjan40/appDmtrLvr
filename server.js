@@ -24,8 +24,14 @@ server.get("*", async function (req, resp) {
     .replace("<!--ssr-->", html) // Вставка HTML в <div id="root"></div>
     .replace("<!--ssr-title-->", store.page.title); // Вставка заголовка страницы
 
-  // Отправка готовой страницы клиенту
-  resp.status(store.page.status).end(page);
+    if (store.page.status >= 300 && store.page.status <= 308) {
+      resp.redirect(store.page.status, store.page.redirectTo);
+    } else {
+      resp.status(store.page.status);
+      resp.end(page);
+    }
+  // resp.status(store.page.status).end(page);
+  // console.log(resp)
 });
 
 server.listen(8000);

@@ -89,6 +89,15 @@ function ProductItem() {
   ] });
 }
 const observerProductsItem = observer(ProductItem);
+let Navigate;
+{
+  Navigate = function Navigate2({ to }) {
+    const { page } = useStore();
+    page.redirect(typeof to === "object" ? to.pathname ?? "/" : to);
+    return null;
+  };
+}
+const Navigate$1 = Navigate;
 const routes = [
   {
     path: "/",
@@ -98,6 +107,7 @@ const routes = [
     path: "/catalog/:id",
     Component: observerProductsItem
   },
+  { path: "/oldd", element: /* @__PURE__ */ jsx(Navigate$1, { to: "/" }) },
   {
     path: "*",
     element: /* @__PURE__ */ jsx(Error404, {})
@@ -146,11 +156,16 @@ class Page {
   constructor(rootStore) {
     this.status = 200;
     this.title = "";
+    this.redirectTo = null;
     makeAutoObservable(this, { rootStore: false });
     this.rootStore = rootStore;
   }
   update(title, status = 200) {
     this.title = title;
+    this.status = status;
+  }
+  redirect(url, status = 301) {
+    this.redirectTo = url;
     this.status = status;
   }
 }
