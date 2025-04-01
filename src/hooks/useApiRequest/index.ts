@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import useApi from "../useApi";
+import { TApiInstance, TApiInstanceKeys } from "../../api";
+import { getByDotKey, GetByDotKey, runFnWithTuple } from "../../types/utility/objects";
 
-function useApiRequest(schema: string, ...params: any): any {
+function useApiRequest<T extends TApiInstanceKeys>(schema: T, ...params: Parameters<GetByDotKey<TApiInstance, T>>) {
   const api = useApi();
-  const fn = schema.split(".").reduce((obj: any, key) => obj[key], api);
+  const fn = getByDotKey(api, schema) 
+  type Res = Awaited<ReturnType<typeof fn>>;  
 
-  const [result, setResult] = useState<TApiRequest<any>>({
+  const [result, setResult] = useState<TApiRequest<Res>>({
     done: false,
     success: false,
     data: null,
@@ -13,12 +16,12 @@ function useApiRequest(schema: string, ...params: any): any {
   });
 
   useEffect(() => {
-    fn(...params)
-      .then((data) =>
+    runFnWithTuple(fn, params)
+      .then((data: any) =>
         setResult({
           done: true,
           success: true,
-          data,
+          data: data as Res,
           error: null,
         })
       )

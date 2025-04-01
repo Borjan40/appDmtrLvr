@@ -2,12 +2,12 @@ import useApiRequest from "../../hooks/useApiRequest";
 import { TProduct } from "../../types/data";
 
 function ProductItem({ product }: { product: TProduct }) {
-  const { done, data } = useApiRequest("products.one", product.id);
-  console.log(done, data);
+  const { success, data } = useApiRequest('products.one', product.id); 
+  console.log(success, data);
   return (
     <div>
       <h1>ProductItem: {product.title}</h1>
-      {done && <div>Reviews: {data.reviews.length}</div>}
+      {success && <div>Reviews: {data.reviews.length}</div>}
     </div>
   );
 }
