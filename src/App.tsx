@@ -1,10 +1,10 @@
 // import { Provider } from 'mobx-react';
-import App from "./components/App.jsx";
-import RootStore from "./store/index.js";
-import storeContext from "./contexts/store.js";
-import createHttpPlugin from "./plugins/http.js";
-import createApi from "./api/index.js";
-import apiContext from "./contexts/api.js";
+import App from "./components/App";
+import RootStore from "./store/index";
+import storeContext from "./contexts/store";
+import createHttpPlugin from "./plugins/http";
+import createApi from "./api/index";
+import apiContext from "./contexts/api";
 
 async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");

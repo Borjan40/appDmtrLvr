@@ -1,6 +1,6 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import { Link, useParams, useRoutes } from "react-router-dom";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { observer as observer$1 } from "mobx-react";
 import { makeAutoObservable, runInAction } from "mobx";
@@ -14,7 +14,7 @@ function useStore() {
   }
   return store;
 }
-function Products() {
+const ProductsPage = observer(() => {
   const { catalog } = useStore();
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsx("h1", { children: "Catalog" }),
@@ -23,32 +23,7 @@ function Products() {
       /* @__PURE__ */ jsx(Link, { to: `/catalog/${pr.id}`, children: "Read more" })
     ] }, pr.id)) })
   ] });
-}
-const observerProducts = observer(Products);
-function Buttons({
-  title,
-  variants,
-  value,
-  onChange,
-  ...rootAttrs
-}) {
-  return /* @__PURE__ */ jsxs("div", { ...rootAttrs, children: [
-    title && /* @__PURE__ */ jsx("h3", { children: title }),
-    variants.map((variant) => {
-      const btnStateCl = variant.value === value ? "btn-primary" : "btn-danger";
-      return /* @__PURE__ */ jsx(
-        "button",
-        {
-          type: "button",
-          className: `btn me-3 ${btnStateCl}`,
-          onClick: () => onChange(variant.value),
-          children: variant.text
-        },
-        variant.value
-      );
-    })
-  ] });
-}
+});
 const Error404 = observer$1(function({
   title = "Page not found"
 }) {
@@ -56,39 +31,44 @@ const Error404 = observer$1(function({
   page.update(title, 404);
   return /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("h1", { children: title }) });
 });
-function ProductItem() {
-  const { catalog, page } = useStore();
-  const params = useParams();
-  const id = params.id ?? "";
-  const validId = /^[1-9]+\d*$/.test(id);
-  const product = catalog.one(+id);
-  const [prodVar, setProdVar] = useState("0");
-  if (!validId || !product) {
-    return /* @__PURE__ */ jsx(Error404, { title: "Product not found" });
+const apiContext = createContext(null);
+function useApi() {
+  const api = useContext(apiContext);
+  if (api === null) {
+    throw new Error("Store moron run sysytem without api provider");
   }
-  page.update(`${product.title} - very good price, buy now!`);
+  return api;
+}
+function ProductItem({ product }) {
+  const { products: prApi } = useApi();
+  const [info, setInfo] = useState(null);
+  console.log(info);
+  useEffect(() => {
+    prApi.one(product.id).then((data) => setInfo(data));
+  }, [product, prApi]);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsxs("h1", { children: [
       "ProductItem:",
       product.title
     ] }),
-    /* @__PURE__ */ jsx(
-      Buttons,
-      {
-        variants: [
-          { text: "M", value: "0" },
-          { text: "L", value: "1" },
-          { text: "XL", value: "2" }
-        ],
-        value: prodVar,
-        title: "Set Size",
-        onChange: setProdVar,
-        rootAttrs: { className: "my-3 alert alert-success", tabIndex: 1 }
-      }
-    )
+    info && /* @__PURE__ */ jsxs("div", { children: [
+      "Reviews: ",
+      info.reviews.length
+    ] })
   ] });
 }
-const observerProductsItem = observer(ProductItem);
+const ProductItemPage = observer(() => {
+  const { catalog, page } = useStore();
+  const params = useParams();
+  const id = params.id ?? "";
+  const validId = /^[1-9]+\d*$/.test(id);
+  const product = catalog.one(+id);
+  if (!validId || !product) {
+    return /* @__PURE__ */ jsx(Error404, { title: "Product not found" });
+  }
+  page.update(`${product.title} - very good price, buy now!`);
+  return /* @__PURE__ */ jsx(ProductItem, { product });
+});
 let Navigate;
 {
   Navigate = function Navigate2({ to }) {
@@ -101,11 +81,11 @@ const Navigate$1 = Navigate;
 const routes = [
   {
     path: "/",
-    Component: observerProducts
+    Component: ProductsPage
   },
   {
     path: "/catalog/:id",
-    Component: observerProductsItem
+    Component: ProductItemPage
   },
   { path: "/oldd", element: /* @__PURE__ */ jsx(Navigate$1, { to: "/" }) },
   {
@@ -188,10 +168,10 @@ function createHttpPlugin(baseURL) {
 function createProductsApi(http) {
   return {
     async all() {
-      return (await http.get("products/indeex.php")).data;
+      return (await http.get("products/index.php")).data;
     },
     async one(id) {
-      return (await http.get(`products/index.php?id=${id}`)).data;
+      return (await http.get(`products/index.php?id=${id}&delay`)).data;
     }
   };
 }
@@ -214,7 +194,7 @@ async function createApp() {
   const store = new RootStore(api);
   console.log("app.jsx store", store);
   await store.catalog.load();
-  const app = /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) });
+  const app = /* @__PURE__ */ jsx(apiContext.Provider, { value: api, children: /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) }) });
   return { app, store };
 }
 async function createServerApp(context) {

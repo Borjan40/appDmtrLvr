@@ -8,7 +8,7 @@ const server = express();
 const template = readFileSync("./dist/index.html").toString("utf-8");
 
 // Раздача статических файлов
-server.use("/assets", express.static("dist/assets"));
+// server.use("/assets", express.static("dist/assets"));
 server.use("/favicon.ico", express.static("dist/favicon.ico"));
 
 // Обработка всех маршрутов
