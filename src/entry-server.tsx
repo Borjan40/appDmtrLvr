@@ -1,17 +1,32 @@
 // import app from './app.jsx'
-import createApp from "./App";
+import { matchRoutes } from "react-router";
+import createApp from "./app";
 import { StaticRouter } from "react-router-dom/server";
+import routes from "./router";
 
 interface ServerAppContext {
   url: string;
 }
 
 async function createServerApp(context: ServerAppContext) {
-  const { app, store } = await createApp();
+  const { app, store, api } = await createApp();
 
-  // choose activeRoute by url
-  // some async oper to get data
-  // e t.c.
+  const activeRoutes = matchRoutes(routes, context.url);
+
+  if (activeRoutes) {
+    const dataRequests = activeRoutes?.map(
+      (i) =>
+        i.route.data != undefined &&
+        i.route.data({
+          store,
+          api,
+          params: i.params,
+        })
+    );
+
+    await Promise.all(dataRequests);
+  }
+
   const serverApp = <StaticRouter location={context.url}>{app}</StaticRouter>;
   return { app: serverApp, store };
 }

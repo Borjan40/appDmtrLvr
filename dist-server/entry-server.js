@@ -1,4 +1,5 @@
 import { jsxs, jsx } from "react/jsx-runtime";
+import { matchRoutes } from "react-router";
 import { Link, useParams, useRoutes } from "react-router-dom";
 import { createContext, useContext, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
@@ -39,21 +40,56 @@ function useApi() {
   }
   return api;
 }
-function ProductItem({ product }) {
-  const { products: prApi } = useApi();
-  const [info, setInfo] = useState(null);
-  console.log(info);
+function getByDotKey(obj, key) {
+  return key.split(".").reduce((t, k) => {
+    if (t[k] === void 0) {
+      throw new Error("dottet key is wrong");
+    }
+    return t[k];
+  }, obj);
+}
+function runFnWithTuple(fn, params) {
+  return fn(...params);
+}
+function useApiRequest(schema, ...params) {
+  const api = useApi();
+  const fn = getByDotKey(api, schema);
+  const [result, setResult] = useState({
+    done: false,
+    success: false,
+    data: null,
+    error: null
+  });
   useEffect(() => {
-    prApi.one(product.id).then((data) => setInfo(data));
-  }, [product, prApi]);
+    runFnWithTuple(fn, params).then(
+      (data) => setResult({
+        done: true,
+        success: true,
+        data,
+        error: null
+      })
+    ).catch((e) => {
+      setResult({
+        done: true,
+        success: false,
+        data: null,
+        error: e
+      });
+    });
+  }, []);
+  return result;
+}
+function ProductItem({ product }) {
+  const { success, data } = useApiRequest("products.one", product.id);
+  console.log(success, data);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsxs("h1", { children: [
-      "ProductItem:",
+      "ProductItem: ",
       product.title
     ] }),
-    info && /* @__PURE__ */ jsxs("div", { children: [
+    success && /* @__PURE__ */ jsxs("div", { children: [
       "Reviews: ",
-      info.reviews.length
+      data.reviews.length
     ] })
   ] });
 }
@@ -85,7 +121,10 @@ const routes = [
   },
   {
     path: "/catalog/:id",
-    Component: ProductItemPage
+    Component: ProductItemPage,
+    async data(context) {
+      await context.api.products.one(parseInt(context.params.id ?? ""));
+    }
   },
   { path: "/oldd", element: /* @__PURE__ */ jsx(Navigate$1, { to: "/" }) },
   {
@@ -195,10 +234,21 @@ async function createApp() {
   console.log("app.jsx store", store);
   await store.catalog.load();
   const app = /* @__PURE__ */ jsx(apiContext.Provider, { value: api, children: /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) }) });
-  return { app, store };
+  return { app, store, api };
 }
 async function createServerApp(context) {
-  const { app, store } = await createApp();
+  const { app, store, api } = await createApp();
+  const activeRoutes = matchRoutes(routes, context.url);
+  if (activeRoutes) {
+    const dataRequests = activeRoutes == null ? void 0 : activeRoutes.map(
+      (i) => i.route.data != void 0 && i.route.data({
+        store,
+        api,
+        params: i.params
+      })
+    );
+    await Promise.all(dataRequests);
+  }
   const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: app });
   return { app: serverApp, store };
 }
