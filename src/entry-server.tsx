@@ -24,7 +24,8 @@ async function createServerApp(context: ServerAppContext) {
         })
     );
 
-    await Promise.all(dataRequests);
+    const responses = await Promise.all(dataRequests);
+    console.log(responses);
   }
 
   const serverApp = <StaticRouter location={context.url}>{app}</StaticRouter>;

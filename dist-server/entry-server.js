@@ -122,8 +122,11 @@ const routes = [
   {
     path: "/catalog/:id",
     Component: ProductItemPage,
-    async data(context) {
-      await context.api.products.one(parseInt(context.params.id ?? ""));
+    async data({ api, params }) {
+      return [
+        `products.one:[${params.id}]`,
+        await api.products.one(parseInt(params.id ?? ""))
+      ];
     }
   },
   { path: "/oldd", element: /* @__PURE__ */ jsx(Navigate$1, { to: "/" }) },
@@ -247,7 +250,8 @@ async function createServerApp(context) {
         params: i.params
       })
     );
-    await Promise.all(dataRequests);
+    const responses = await Promise.all(dataRequests);
+    console.log(responses);
   }
   const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: app });
   return { app: serverApp, store };

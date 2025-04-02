@@ -6,8 +6,10 @@ import Error404 from "../components/errors/Error404";
 import RootStore from "../store";
 import { TApiInstance } from "../api";
 
+type DataLoaderResult = [string, unknown];
+
 type Route = RouteObject & {
-  data?: (context: RouteDataLoader) => Promise<unknown>;
+  data?: (context: RouteDataLoader) => Promise<DataLoaderResult>;
 };
 
 type RouteDataLoader = {
@@ -24,8 +26,11 @@ const routes: Route[] = [
   {
     path: "/catalog/:id",
     Component: ProductItemPage,
-    async data(context) {
-      await context.api.products.one(parseInt(context.params.id ?? ""));
+    async data({ api, params }) {
+      return [
+        `products.one:[${params.id}]`,
+        await api.products.one(parseInt(params.id ?? "")),
+      ];
     },
   },
   { path: "/oldd", element: <Navigate to="/" /> },
