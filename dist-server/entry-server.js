@@ -239,9 +239,11 @@ async function createApp() {
   const app = /* @__PURE__ */ jsx(apiContext.Provider, { value: api, children: /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) }) });
   return { app, store, api };
 }
+const casheContext = createContext({});
 async function createServerApp(context) {
   const { app, store, api } = await createApp();
   const activeRoutes = matchRoutes(routes, context.url);
+  const cashe = {};
   if (activeRoutes) {
     const dataRequests = activeRoutes == null ? void 0 : activeRoutes.map(
       (i) => i.route.data != void 0 && i.route.data({
@@ -251,9 +253,14 @@ async function createServerApp(context) {
       })
     );
     const responses = await Promise.all(dataRequests);
-    console.log(responses);
+    responses.forEach((response) => {
+      if (response !== false) {
+        cashe[response[0]] = response[1];
+      }
+    });
   }
-  const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: app });
+  console.log(cashe);
+  const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: /* @__PURE__ */ jsx(casheContext.Provider, { value: cashe, children: app }) });
   return { app: serverApp, store };
 }
 export {
