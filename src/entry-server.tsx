@@ -1,6 +1,6 @@
 // import app from './app.jsx'
 import { matchRoutes } from "react-router";
-import createApp from "./app";
+import createApp from "./App";
 import { StaticRouter } from "react-router-dom/server";
 import routes from "./router";
 import casheContext from "./contexts/cashe";

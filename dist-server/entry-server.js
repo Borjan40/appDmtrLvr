@@ -1,7 +1,7 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import { matchRoutes } from "react-router";
 import { Link, useParams, useRoutes } from "react-router-dom";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext } from "react";
 import { observer } from "mobx-react-lite";
 import { observer as observer$1 } from "mobx-react";
 import { makeAutoObservable, runInAction } from "mobx";
@@ -48,39 +48,32 @@ function getByDotKey(obj, key) {
     return t[k];
   }, obj);
 }
-function runFnWithTuple(fn, params) {
-  return fn(...params);
-}
-function useApiRequest(schema, ...params) {
+const casheContext = createContext({});
+function useApiRequestServer(schema, ...params) {
   const api = useApi();
-  const fn = getByDotKey(api, schema);
-  const [result, setResult] = useState({
+  getByDotKey(api, schema);
+  const cashe = useContext(casheContext);
+  const key = schema + ":" + JSON.stringify(params);
+  const result = cashe[key] ? {
+    done: true,
+    success: true,
+    data: cashe[key],
+    error: null
+  } : {
     done: false,
     success: false,
     data: null,
     error: null
-  });
-  useEffect(() => {
-    runFnWithTuple(fn, params).then(
-      (data) => setResult({
-        done: true,
-        success: true,
-        data,
-        error: null
-      })
-    ).catch((e) => {
-      setResult({
-        done: true,
-        success: false,
-        data: null,
-        error: e
-      });
-    });
-  }, []);
+  };
   return result;
 }
+let useApiRequest;
+{
+  useApiRequest = useApiRequestServer;
+}
+const useApiRequest$1 = useApiRequest;
 function ProductItem({ product }) {
-  const { success, data } = useApiRequest("products.one", product.id);
+  const { success, data } = useApiRequest$1("products.one", product.id);
   console.log(success, data);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsxs("h1", { children: [
@@ -239,7 +232,6 @@ async function createApp() {
   const app = /* @__PURE__ */ jsx(apiContext.Provider, { value: api, children: /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) }) });
   return { app, store, api };
 }
-const casheContext = createContext({});
 async function createServerApp(context) {
   const { app, store, api } = await createApp();
   const activeRoutes = matchRoutes(routes, context.url);
