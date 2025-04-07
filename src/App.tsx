@@ -11,7 +11,6 @@ async function createApp() {
   const api = createApi(http);
   const store = new RootStore(api);
 
-  // console.log("app.jsx store", store);
   await store.catalog.load();
   const app = (
     <apiContext.Provider value={api}>

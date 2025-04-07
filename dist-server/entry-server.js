@@ -1,5 +1,4 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import { matchRoutes } from "react-router";
 import { Link, useParams, useRoutes } from "react-router-dom";
 import { createContext, useContext } from "react";
 import { observer } from "mobx-react-lite";
@@ -113,13 +112,7 @@ const routes = [
   },
   {
     path: "/catalog/:id",
-    Component: ProductItemPage,
-    async data({ api, params }) {
-      return [
-        `products.one:[${params.id}]`,
-        await api.products.one(parseInt(params.id ?? ""))
-      ];
-    }
+    Component: ProductItemPage
   },
   { path: "/oldd", element: /* @__PURE__ */ jsx(Navigate$1, { to: "/" }) },
   {
@@ -231,24 +224,8 @@ async function createApp() {
   return { app, store, api };
 }
 async function createServerApp(context) {
-  const { app, store, api } = await createApp();
-  const activeRoutes = matchRoutes(routes, context.url);
+  const { app, store } = await createApp();
   const cashe = {};
-  if (activeRoutes) {
-    const dataRequests = activeRoutes == null ? void 0 : activeRoutes.map(
-      (i) => i.route.data != void 0 && i.route.data({
-        store,
-        api,
-        params: i.params
-      })
-    );
-    const responses = await Promise.all(dataRequests);
-    responses.forEach((response) => {
-      if (response !== false) {
-        cashe[response[0]] = response[1];
-      }
-    });
-  }
   const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: /* @__PURE__ */ jsx(casheContext.Provider, { value: cashe, children: app }) });
   return { app: serverApp, store };
 }
