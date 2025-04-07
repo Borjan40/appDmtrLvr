@@ -47,23 +47,43 @@ function getByDotKey(obj, key) {
     return t[k];
   }, obj);
 }
-const casheContext = createContext({});
+function runFnWithTuple(fn, params) {
+  return fn(...params);
+}
+const casheContext = createContext(null);
+function useCashe() {
+  const cashe = useContext(casheContext);
+  if (cashe === null) {
+    throw new Error(
+      "Store moron run sysytem without cashe provider, please check who is it"
+    );
+  }
+  return cashe;
+}
 function useApiRequestServer(schema, ...params) {
   const api = useApi();
-  getByDotKey(api, schema);
-  const cashe = useContext(casheContext);
+  const fn = getByDotKey(api, schema);
+  const cashe = useCashe();
   const key = schema + ":" + JSON.stringify(params);
-  const result = cashe[key] ? {
-    done: true,
-    success: true,
-    data: cashe[key],
-    error: null
-  } : {
-    done: false,
-    success: false,
-    data: null,
-    error: null
-  };
+  let result;
+  if (key in cashe.data) {
+    result = {
+      done: true,
+      success: true,
+      data: cashe.data[key],
+      error: null
+    };
+  } else {
+    if (!(key in cashe.awaiting)) {
+      cashe.awaiting[key] = runFnWithTuple(fn, params);
+    }
+    result = {
+      done: false,
+      success: false,
+      data: null,
+      error: null
+    };
+  }
   return result;
 }
 let useApiRequest;
@@ -225,9 +245,9 @@ async function createApp() {
 }
 async function createServerApp(context) {
   const { app, store } = await createApp();
-  const cashe = {};
+  const cashe = { data: {}, awaiting: {} };
   const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: /* @__PURE__ */ jsx(casheContext.Provider, { value: cashe, children: app }) });
-  return { app: serverApp, store };
+  return { app: serverApp, store, cashe };
 }
 export {
   createServerApp as default

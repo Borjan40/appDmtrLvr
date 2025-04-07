@@ -1,5 +1,9 @@
 import { createContext } from "react";
 
-const casheContext = createContext<Record<string, unknown>>({});
+export interface Cashe {
+  data: Record<string, unknown>;
+  awaiting: Record<string, Promise<unknown>>;
+}
 
+const casheContext = createContext<Cashe | null>(null);
 export default casheContext;
