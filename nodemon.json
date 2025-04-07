@@ -1,0 +1,3 @@
+{
+  "watch": ["dist-server/entry-server.js", "dist/index.html", "server.js"]
+}

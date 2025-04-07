@@ -74,7 +74,6 @@ let useApiRequest;
 const useApiRequest$1 = useApiRequest;
 function ProductItem({ product }) {
   const { success, data } = useApiRequest$1("products.one", product.id);
-  console.log(success, data);
   return /* @__PURE__ */ jsxs("div", { children: [
     /* @__PURE__ */ jsxs("h1", { children: [
       "ProductItem: ",
@@ -227,7 +226,6 @@ async function createApp() {
   const http = createHttpPlugin("https://faceprog.ru/reactcourseapi/");
   const api = createApi(http);
   const store = new RootStore(api);
-  console.log("app.jsx store", store);
   await store.catalog.load();
   const app = /* @__PURE__ */ jsx(apiContext.Provider, { value: api, children: /* @__PURE__ */ jsx(storeContext.Provider, { value: store, children: /* @__PURE__ */ jsx(App, {}) }) });
   return { app, store, api };
@@ -251,7 +249,6 @@ async function createServerApp(context) {
       }
     });
   }
-  console.log(cashe);
   const serverApp = /* @__PURE__ */ jsx(StaticRouter, { location: context.url, children: /* @__PURE__ */ jsx(casheContext.Provider, { value: cashe, children: app }) });
   return { app: serverApp, store };
 }

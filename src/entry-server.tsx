@@ -1,6 +1,6 @@
 // import app from './app.jsx'
 import { matchRoutes } from "react-router";
-import createApp from "./App";
+import createApp from "./app";
 import { StaticRouter } from "react-router-dom/server";
 import routes from "./router";
 import casheContext from "./contexts/cashe";
@@ -8,6 +8,7 @@ import casheContext from "./contexts/cashe";
 interface ServerAppContext {
   url: string;
 }
+
 
 async function createServerApp(context: ServerAppContext) {
   const { app, store, api } = await createApp();
@@ -33,7 +34,7 @@ async function createServerApp(context: ServerAppContext) {
     });
   }
 
-  console.log(cashe);
+  // console.log(cashe);
 
   const serverApp = (
     <StaticRouter location={context.url}>

@@ -3,7 +3,7 @@ import { TProduct } from "../../types/data";
 
 function ProductItem({ product }: { product: TProduct }) {
   const { success, data } = useApiRequest('products.one', product.id); 
-  console.log(success, data);
+  // console.log(success, data);
   return (
     <div>
       <h1>ProductItem: {product.title}</h1>
