@@ -13,11 +13,14 @@ server.use("/assets", express.static("dist/assets"));
 server.use("/favicon.ico", express.static("dist/favicon.ico"));
 
 async function recoursiveRender(app, cashe) {
-  const html = renderToString(app);
-const awaitingArr = Object.entries(cashe.awaiting)
+
+const html = renderToString(app);
+const awaitingArr = Object.entries(cashe.awaiting);
+
+console.log("html +n----",html + "\n-----------------------\n")
 
 if(awaitingArr.length > 0) {
-console.log(await Promise.all(awaitingArr.map(([k, p]) => p.then(data =>({k, data})))))
+await Promise.all(awaitingArr.map(([k, p]) => p.then(data =>({k, data}))))
 }
   return html;
 
@@ -27,9 +30,9 @@ server.get("*", async function (req, resp) {
   try {
     const context = { url: req.url };
     const { app, store, cashe } = await createApp(context);
-    console.log(cashe);
+    console.log("before", cashe);
     const html = await recoursiveRender(app, cashe);
-    console.log(cashe);
+    console.log("after", cashe);
     const page = template
       .replace("<!--ssr-->", html)
       .replace("<!--ssr-title-->", store.page.title);
@@ -40,6 +43,7 @@ server.get("*", async function (req, resp) {
       resp.end(page);
     }
   } catch (e) {
+    console.log(e)
     resp.end(template);
   }
 });
