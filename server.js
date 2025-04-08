@@ -13,17 +13,19 @@ server.use("/assets", express.static("dist/assets"));
 server.use("/favicon.ico", express.static("dist/favicon.ico"));
 
 async function recoursiveRender(app, cashe) {
+  const html = renderToString(app);
+  const awaitingArr = Object.entries(cashe.awaiting);
 
-const html = renderToString(app);
-const awaitingArr = Object.entries(cashe.awaiting);
+  console.log("html +n----", html + "\n-----------------------\n");
+  console.log(awaitingArr.length);
 
-console.log("html +n----",html + "\n-----------------------\n")
-
-if(awaitingArr.length > 0) {
-await Promise.all(awaitingArr.map(([k, p]) => p.then(data =>({k, data}))))
-}
+  if (awaitingArr.length > 0) {
+  const awaited = await Promise.all(
+      awaitingArr.map(([k, p]) => p.then((data) => ({ k, data })))
+    );
+    console.log(awaited);
+  }
   return html;
-
 }
 
 server.get("*", async function (req, resp) {
@@ -43,7 +45,7 @@ server.get("*", async function (req, resp) {
       resp.end(page);
     }
   } catch (e) {
-    console.log(e)
+    console.log(e);
     resp.end(template);
   }
 });
