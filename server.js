@@ -16,14 +16,20 @@ async function recoursiveRender(app, cashe) {
   const html = renderToString(app);
   const awaitingArr = Object.entries(cashe.awaiting);
 
-  console.log("html +n----", html + "\n-----------------------\n");
-  console.log(awaitingArr.length);
+  console.log("html +n----+n", html + "\n-----------------------\n");
+  console.log("awaitingArr +n----+n", awaitingArr + "\n-----------------------\n");
+  console.log("awaitingArr.length--->",awaitingArr.length);
 
   if (awaitingArr.length > 0) {
-  const awaited = await Promise.all(
+    const items = await Promise.all(
       awaitingArr.map(([k, p]) => p.then((data) => ({ k, data })))
     );
-    console.log(awaited);
+    items.forEach((item) => {
+      cashe.data[item.k] = item.data;
+    });
+    cashe.awaiting = {}; 
+
+    return recoursiveRender(app, cashe);
   }
   return html;
 }
@@ -32,9 +38,9 @@ server.get("*", async function (req, resp) {
   try {
     const context = { url: req.url };
     const { app, store, cashe } = await createApp(context);
-    console.log("before", cashe);
+    console.log("before", cashe + "\n-----------------------\n");
     const html = await recoursiveRender(app, cashe);
-    console.log("after", cashe);
+    console.log("after", cashe + "\n-----------------------\n");
     const page = template
       .replace("<!--ssr-->", html)
       .replace("<!--ssr-title-->", store.page.title);
@@ -51,3 +57,4 @@ server.get("*", async function (req, resp) {
 });
 
 server.listen(8000);
+
